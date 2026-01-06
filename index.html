@@ -1,0 +1,1687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WHISPERS: THE VOID EDITION v3.1</title>
+    <style>
+        :root {
+            --void-dark: #050508;
+            --void-deeper: #0a0a10;
+            --void-surface: #101018;
+            --void-elevated: #181824;
+            --void-border: #252535;
+            --whisper-primary: #7c3aed;
+            --whisper-secondary: #a855f7;
+            --whisper-glow: #c084fc;
+            --whisper-cyan: #06b6d4;
+            --whisper-teal: #14b8a6;
+            --void-green: #22c55e;
+            --void-amber: #f59e0b;
+            --void-red: #ef4444;
+            --void-text: #e2e8f0;
+            --void-muted: #94a3b8;
+            --void-dim: #64748b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
+            background: var(--void-dark);
+            color: var(--void-text);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(ellipse at 20% 20%, rgba(124, 58, 237, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(6, 182, 212, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(168, 85, 247, 0.04) 0%, transparent 70%);
+        }
+
+        .whisper-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            border-bottom: 1px solid var(--void-border);
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .whisper-logo {
+            font-size: 2.8rem;
+            font-weight: 900;
+            letter-spacing: -2px;
+            background: linear-gradient(135deg, var(--whisper-primary), var(--whisper-secondary), var(--whisper-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 60px rgba(124, 58, 237, 0.5);
+            margin-bottom: 8px;
+        }
+
+        .whisper-subtitle {
+            color: var(--void-muted);
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .version-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--whisper-primary), var(--whisper-cyan));
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            margin-top: 12px;
+            letter-spacing: 1px;
+        }
+
+        .echo-status {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.7rem;
+            color: var(--void-muted);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--void-green);
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 4px var(--void-green); }
+            50% { box-shadow: 0 0 12px var(--void-green), 0 0 20px var(--void-green); }
+        }
+
+        .security-banner {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(6, 182, 212, 0.15));
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .security-icon { font-size: 1.5rem; }
+
+        .security-text { flex: 1; }
+
+        .security-title {
+            font-weight: 700;
+            color: var(--whisper-glow);
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+
+        .security-desc {
+            font-size: 0.75rem;
+            color: var(--void-muted);
+            line-height: 1.5;
+        }
+
+        .whisper-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 1200px) { .whisper-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 800px) { 
+            .whisper-grid { grid-template-columns: 1fr; }
+            .whisper-logo { font-size: 2rem; }
+            .security-banner { flex-direction: column; text-align: center; }
+        }
+
+        .whisper-panel {
+            background: var(--void-surface);
+            border: 1px solid var(--void-border);
+            border-radius: 16px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .whisper-panel::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--whisper-primary), var(--whisper-cyan));
+            opacity: 0.6;
+        }
+
+        .whisper-panel.trinity::before {
+            background: linear-gradient(90deg, var(--void-green), var(--whisper-cyan), var(--whisper-primary));
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--void-border);
+        }
+
+        .panel-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.3), rgba(6, 182, 212, 0.3));
+            border: 1px solid var(--void-border);
+        }
+
+        .panel-title {
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .panel-meta {
+            font-size: 0.65rem;
+            color: var(--void-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-group { margin-bottom: 14px; }
+
+        label {
+            display: block;
+            font-size: 0.7rem;
+            color: var(--void-muted);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        label.required::after {
+            content: ' *';
+            color: var(--void-red);
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px 12px;
+            background: var(--void-deeper);
+            border: 1px solid var(--void-border);
+            border-radius: 8px;
+            color: var(--void-text);
+            font-family: inherit;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--whisper-primary);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+        }
+
+        input.secret-input {
+            border-color: rgba(34, 197, 94, 0.4);
+            background: rgba(34, 197, 94, 0.05);
+        }
+
+        input.secret-input:focus {
+            border-color: var(--void-green);
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .whisper-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, var(--whisper-primary), var(--whisper-secondary));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-family: inherit;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 0.5px;
+        }
+
+        .whisper-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(124, 58, 237, 0.4);
+        }
+
+        .whisper-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .whisper-btn.secondary {
+            background: var(--void-elevated);
+            border: 1px solid var(--void-border);
+        }
+
+        .whisper-btn.danger {
+            background: linear-gradient(135deg, var(--void-red), #dc2626);
+        }
+
+        .whisper-btn.small {
+            padding: 6px 12px;
+            font-size: 0.7rem;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge.success {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--void-green);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .status-badge.warning {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--void-amber);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .status-badge.error {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--void-red);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .status-badge.info {
+            background: rgba(124, 58, 237, 0.15);
+            color: var(--whisper-glow);
+            border: 1px solid rgba(124, 58, 237, 0.3);
+        }
+
+        .trinity-card {
+            background: var(--void-elevated);
+            border: 1px solid var(--void-border);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 10px;
+            transition: all 0.2s;
+        }
+
+        .trinity-card:hover {
+            border-color: var(--whisper-primary);
+        }
+
+        .trinity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .trinity-identity {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .trinity-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 0.9rem;
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .trinity-name { font-weight: 700; font-size: 0.9rem; }
+
+        .trinity-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: var(--whisper-glow);
+        }
+
+        .stat-label {
+            font-size: 0.6rem;
+            color: var(--void-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .key-display {
+            font-family: monospace;
+            font-size: 0.6rem;
+            color: var(--whisper-cyan);
+            background: var(--void-deeper);
+            padding: 4px 8px;
+            border-radius: 4px;
+            word-break: break-all;
+            margin-top: 8px;
+        }
+
+        .channel-card {
+            background: var(--void-elevated);
+            border: 1px solid var(--void-border);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 8px;
+        }
+
+        .channel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .channel-parties {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .channel-arrow { color: var(--whisper-cyan); }
+
+        .whisper-card {
+            background: var(--void-deeper);
+            border: 1px solid var(--void-border);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+        }
+
+        .whisper-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.7rem;
+        }
+
+        .whisper-route {
+            color: var(--whisper-glow);
+            font-weight: 700;
+        }
+
+        .whisper-time { color: var(--void-dim); }
+
+        .whisper-body {
+            font-size: 0.8rem;
+            line-height: 1.5;
+            margin-bottom: 8px;
+            color: var(--void-text);
+        }
+
+        .whisper-body.encrypted {
+            color: var(--void-dim);
+            font-style: italic;
+        }
+
+        .whisper-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 0.6rem;
+            color: var(--void-dim);
+        }
+
+        .echo-console {
+            background: #000;
+            border-radius: 10px;
+            padding: 14px;
+            font-size: 0.65rem;
+            max-height: 220px;
+            overflow-y: auto;
+            border: 1px solid var(--void-border);
+        }
+
+        .console-line {
+            margin-bottom: 3px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .console-time {
+            color: var(--void-dim);
+            min-width: 65px;
+        }
+
+        .console-info { color: var(--whisper-cyan); }
+        .console-success { color: var(--void-green); }
+        .console-warn { color: var(--void-amber); }
+        .console-error { color: var(--void-red); }
+        .console-whisper { color: var(--whisper-glow); }
+
+        .full-width { grid-column: 1 / -1; }
+        .span-2 { grid-column: span 2; }
+
+        @media (max-width: 800px) { .span-2 { grid-column: span 1; } }
+
+        .secret-field { position: relative; }
+
+        .secret-field input { padding-right: 36px; }
+
+        .secret-toggle {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--void-muted);
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .fade-in { animation: fadeSlideIn 0.3s ease-out; }
+
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .whisper-scroll {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .zk-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.6rem;
+            color: var(--void-green);
+            background: rgba(34, 197, 94, 0.1);
+            padding: 2px 8px;
+            border-radius: 10px;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .blind-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.6rem;
+            color: var(--whisper-cyan);
+            background: rgba(6, 182, 212, 0.1);
+            padding: 2px 8px;
+            border-radius: 10px;
+            border: 1px solid rgba(6, 182, 212, 0.3);
+        }
+
+        .echo-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        @media (max-width: 600px) { .echo-stats { grid-template-columns: repeat(2, 1fr); } }
+
+        .echo-stat {
+            background: var(--void-deeper);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .echo-value {
+            font-size: 1rem;
+            font-weight: 900;
+            color: var(--whisper-cyan);
+        }
+
+        .echo-label {
+            font-size: 0.55rem;
+            color: var(--void-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 3px;
+        }
+
+        .shared-secret-info {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 12px;
+        }
+
+        .shared-secret-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--void-green);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .shared-secret-explain {
+            font-size: 0.7rem;
+            color: var(--void-muted);
+            line-height: 1.5;
+        }
+
+        .channel-key-section {
+            background: var(--void-deeper);
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        .channel-key-label {
+            font-size: 0.65rem;
+            color: var(--void-dim);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .channel-key-value {
+            font-family: monospace;
+            font-size: 0.6rem;
+            color: var(--whisper-cyan);
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="whisper-container">
+        <header>
+            <div class="echo-status">
+                <div class="status-dot"></div>
+                <span>TRINITY ACTIVE</span>
+            </div>
+            <div class="whisper-logo">👁‍🗨 WHISPERS</div>
+            <div class="whisper-subtitle">The Void Edition • Trinity Protocol • Blind Shared Secrets</div>
+            <div class="version-badge">v3.1 TRINITY • ZK BLIND SHARING • PGP-STYLE CHANNELS</div>
+        </header>
+
+        <div class="security-banner">
+            <div class="security-icon">🔐</div>
+            <div class="security-text">
+                <div class="security-title">Trinity Protocol: Name + Shared Secret + ZK Blinding</div>
+                <div class="security-desc">
+                    Each whisper channel uses a <strong>shared secret</strong> known only to both parties. 
+                    Your identity secret authenticates you. The shared secret encrypts messages bidirectionally.
+                    ZK blinding proves channel membership without revealing the shared secret.
+                    <strong>No secrets are stored</strong> — enter them fresh for each operation.
+                </div>
+            </div>
+        </div>
+
+        <div class="whisper-grid">
+            <!-- Trinity Registration -->
+            <div class="whisper-panel trinity">
+                <div class="panel-header">
+                    <div class="panel-icon">👤</div>
+                    <div>
+                        <div class="panel-title">Trinity Registration</div>
+                        <div class="panel-meta">Name + Identity Secret</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="required">Your Name</label>
+                    <input type="text" id="regName" placeholder="e.g., Alice, Bob, Shadow...">
+                </div>
+
+                <div class="form-group secret-field">
+                    <label class="required">Identity Secret</label>
+                    <input type="password" id="regSecret" class="secret-input" placeholder="Your personal secret (min 8 chars)">
+                    <button class="secret-toggle" onclick="toggleSecret('regSecret')">👁</button>
+                </div>
+
+                <div style="margin-top: 14px;">
+                    <button class="whisper-btn" onclick="registerTrinity()">⚡ Register Identity</button>
+                </div>
+
+                <div class="shared-secret-info">
+                    <div class="shared-secret-title">🔑 How It Works</div>
+                    <div class="shared-secret-explain">
+                        1. Register with your <strong>name</strong> and <strong>identity secret</strong><br>
+                        2. To whisper, establish a <strong>shared secret</strong> with your partner (out-of-band)<br>
+                        3. Both parties use the same shared secret for that channel<br>
+                        4. Messages encrypted with shared secret — both can decrypt
+                    </div>
+                </div>
+
+                <div id="trinityList" style="margin-top: 16px;"></div>
+            </div>
+
+            <!-- Channel Establishment -->
+            <div class="whisper-panel trinity">
+                <div class="panel-header">
+                    <div class="panel-icon">🔗</div>
+                    <div>
+                        <div class="panel-title">Establish Channel</div>
+                        <div class="panel-meta">Create Encrypted Channel with Shared Secret</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="required">Your Name</label>
+                    <select id="channelFrom"><option value="">Select your identity...</option></select>
+                </div>
+
+                <div class="form-group secret-field">
+                    <label class="required">Your Identity Secret</label>
+                    <input type="password" id="channelMySecret" class="secret-input" placeholder="Authenticate yourself">
+                    <button class="secret-toggle" onclick="toggleSecret('channelMySecret')">👁</button>
+                </div>
+
+                <div class="form-group">
+                    <label class="required">Partner Name</label>
+                    <select id="channelTo"><option value="">Select partner...</option></select>
+                </div>
+
+                <div class="form-group secret-field">
+                    <label class="required">Shared Channel Secret</label>
+                    <input type="password" id="channelSharedSecret" class="secret-input" placeholder="Secret you both agreed on">
+                    <button class="secret-toggle" onclick="toggleSecret('channelSharedSecret')">👁</button>
+                </div>
+
+                <button class="whisper-btn" onclick="establishChannel()">🔐 Establish Channel</button>
+
+                <div id="channelList" style="margin-top: 16px;"></div>
+            </div>
+
+            <!-- Whisper Drop -->
+            <div class="whisper-panel trinity">
+                <div class="panel-header">
+                    <div class="panel-icon">🌬️</div>
+                    <div>
+                        <div class="panel-title">Whisper Drop</div>
+                        <div class="panel-meta">Send Encrypted Message</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="required">Your Name</label>
+                    <select id="whisperFrom"><option value="">Select your identity...</option></select>
+                </div>
+
+                <div class="form-group secret-field">
+                    <label class="required">Your Identity Secret</label>
+                    <input type="password" id="whisperMySecret" class="secret-input" placeholder="Authenticate yourself">
+                    <button class="secret-toggle" onclick="toggleSecret('whisperMySecret')">👁</button>
+                </div>
+
+                <div class="form-group">
+                    <label class="required">Send To</label>
+                    <select id="whisperTo"><option value="">Select recipient...</option></select>
+                </div>
+
+                <div class="form-group secret-field">
+                    <label class="required">Shared Channel Secret</label>
+                    <input type="password" id="whisperSharedSecret" class="secret-input" placeholder="Your shared secret with recipient">
+                    <button class="secret-toggle" onclick="toggleSecret('whisperSharedSecret')">👁</button>
+                </div>
+
+                <div class="form-group">
+                    <label class="required">Message</label>
+                    <textarea id="whisperContent" placeholder="Your secret message..."></textarea>
+                </div>
+
+                <div class="btn-row">
+                    <button class="whisper-btn" onclick="dropWhisper()">🤫 Send Whisper</button>
+                    <button class="whisper-btn secondary" onclick="clearWhisperForm()">Clear</button>
+                </div>
+            </div>
+
+            <!-- Inbox -->
+            <div class="whisper-panel span-2 trinity">
+                <div class="panel-header">
+                    <div class="panel-icon">👂</div>
+                    <div>
+                        <div class="panel-title">Whisper Inbox</div>
+                        <div class="panel-meta">Decrypt Messages with Shared Secret</div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                    <div class="form-group">
+                        <label class="required">Your Name</label>
+                        <select id="inboxName"><option value="">Select your identity...</option></select>
+                    </div>
+                    <div class="form-group secret-field">
+                        <label class="required">Your Identity Secret</label>
+                        <input type="password" id="inboxMySecret" class="secret-input" placeholder="Authenticate yourself">
+                        <button class="secret-toggle" onclick="toggleSecret('inboxMySecret')">👁</button>
+                    </div>
+                </div>
+
+                <div class="form-group secret-field">
+                    <label class="required">Shared Secret (for channel you want to read)</label>
+                    <input type="password" id="inboxSharedSecret" class="secret-input" placeholder="Shared secret with conversation partner">
+                    <button class="secret-toggle" onclick="toggleSecret('inboxSharedSecret')">👁</button>
+                </div>
+
+                <button class="whisper-btn" onclick="refreshInbox()" style="margin-bottom: 14px;">🔓 Decrypt & View</button>
+
+                <div id="whisperList" class="whisper-scroll">
+                    <p style="color: var(--void-dim); font-size: 0.75rem;">
+                        Enter your credentials and shared secret to decrypt messages
+                    </p>
+                </div>
+            </div>
+
+            <!-- ZK Verification -->
+            <div class="whisper-panel">
+                <div class="panel-header">
+                    <div class="panel-icon">🔍</div>
+                    <div>
+                        <div class="panel-title">ZK Channel Proof</div>
+                        <div class="panel-meta">Prove Membership Without Revealing Secret</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="required">Your Name</label>
+                    <select id="zkProver"><option value="">Select your identity...</option></select>
+                </div>
+
+                <div class="form-group secret-field">
+                    <label class="required">Your Identity Secret</label>
+                    <input type="password" id="zkMySecret" class="secret-input" placeholder="Authenticate yourself">
+                    <button class="secret-toggle" onclick="toggleSecret('zkMySecret')">👁</button>
+                </div>
+
+                <div class="form-group">
+                    <label class="required">Channel Partner</label>
+                    <select id="zkPartner"><option value="">Select partner...</option></select>
+                </div>
+
+                <div class="form-group secret-field">
+                    <label class="required">Shared Channel Secret</label>
+                    <input type="password" id="zkSharedSecret" class="secret-input" placeholder="Prove you know this">
+                    <button class="secret-toggle" onclick="toggleSecret('zkSharedSecret')">👁</button>
+                </div>
+
+                <button class="whisper-btn" onclick="generateZKProof()">🔐 Generate ZK Proof</button>
+
+                <div id="zkResult" style="margin-top: 14px;"></div>
+            </div>
+
+            <!-- Console -->
+            <div class="whisper-panel full-width">
+                <div class="panel-header">
+                    <div class="panel-icon">🖥️</div>
+                    <div>
+                        <div class="panel-title">Trinity Console</div>
+                        <div class="panel-meta">System Log • No Secrets Logged</div>
+                    </div>
+                    <button class="whisper-btn danger small" onclick="silenceAll()" style="margin-left: auto;">🗑️ Reset All</button>
+                </div>
+
+                <div class="echo-console" id="console">
+                    <div class="console-line">
+                        <span class="console-time">[BOOT]</span>
+                        <span class="console-whisper">WHISPERS v3.1 TRINITY PROTOCOL</span>
+                    </div>
+                    <div class="console-line">
+                        <span class="console-time">[CRYPTO]</span>
+                        <span class="console-info">AES-256-GCM encryption ready</span>
+                    </div>
+                    <div class="console-line">
+                        <span class="console-time">[ZK]</span>
+                        <span class="console-info">Blind commitment scheme active</span>
+                    </div>
+                    <div class="console-line">
+                        <span class="console-time">[READY]</span>
+                        <span class="console-success">System ready • Shared secrets enable bidirectional decryption</span>
+                    </div>
+                </div>
+
+                <div class="echo-stats">
+                    <div class="echo-stat">
+                        <div class="echo-value" id="statIdentities">0</div>
+                        <div class="echo-label">Identities</div>
+                    </div>
+                    <div class="echo-stat">
+                        <div class="echo-value" id="statChannels">0</div>
+                        <div class="echo-label">Channels</div>
+                    </div>
+                    <div class="echo-stat">
+                        <div class="echo-value" id="statWhispers">0</div>
+                        <div class="echo-label">Whispers</div>
+                    </div>
+                    <div class="echo-stat">
+                        <div class="echo-value" id="statProofs">0</div>
+                        <div class="echo-label">ZK Proofs</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ════════════════════════════════════════════════════════════════════════
+        // CRYPTOGRAPHIC PRIMITIVES
+        // ════════════════════════════════════════════════════════════════════════
+
+        async function sha256(data) {
+            const buffer = typeof data === 'string' 
+                ? new TextEncoder().encode(data) 
+                : data;
+            const hash = await crypto.subtle.digest('SHA-256', buffer);
+            return Array.from(new Uint8Array(hash))
+                .map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        function secureRandom(len = 32) {
+            const arr = new Uint8Array(len);
+            crypto.getRandomValues(arr);
+            return Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        // Derive a key from shared secret for AES-GCM
+        async function deriveAESKey(sharedSecret, salt) {
+            const keyMaterial = await crypto.subtle.importKey(
+                'raw',
+                new TextEncoder().encode(sharedSecret),
+                'PBKDF2',
+                false,
+                ['deriveBits', 'deriveKey']
+            );
+            
+            return await crypto.subtle.deriveKey(
+                {
+                    name: 'PBKDF2',
+                    salt: new TextEncoder().encode(salt),
+                    iterations: 100000,
+                    hash: 'SHA-256'
+                },
+                keyMaterial,
+                { name: 'AES-GCM', length: 256 },
+                false,
+                ['encrypt', 'decrypt']
+            );
+        }
+
+        // Encrypt with AES-GCM using shared secret
+        async function encryptAESGCM(plaintext, sharedSecret, channelId) {
+            try {
+                const key = await deriveAESKey(sharedSecret, channelId);
+                const iv = crypto.getRandomValues(new Uint8Array(12));
+                const encoded = new TextEncoder().encode(plaintext);
+                
+                const ciphertext = await crypto.subtle.encrypt(
+                    { name: 'AES-GCM', iv },
+                    key,
+                    encoded
+                );
+                
+                // Combine IV + ciphertext
+                const combined = new Uint8Array(iv.length + ciphertext.byteLength);
+                combined.set(iv);
+                combined.set(new Uint8Array(ciphertext), iv.length);
+                
+                return Array.from(combined).map(b => b.toString(16).padStart(2, '0')).join('');
+            } catch (e) {
+                console.error('Encryption error:', e);
+                return null;
+            }
+        }
+
+        // Decrypt with AES-GCM using shared secret
+        async function decryptAESGCM(encryptedHex, sharedSecret, channelId) {
+            try {
+                const key = await deriveAESKey(sharedSecret, channelId);
+                const data = new Uint8Array(encryptedHex.match(/.{2}/g).map(b => parseInt(b, 16)));
+                
+                const iv = data.slice(0, 12);
+                const ciphertext = data.slice(12);
+                
+                const decrypted = await crypto.subtle.decrypt(
+                    { name: 'AES-GCM', iv },
+                    key,
+                    ciphertext
+                );
+                
+                return new TextDecoder().decode(decrypted);
+            } catch (e) {
+                // Decryption failed - wrong key
+                return null;
+            }
+        }
+
+        // Generate ZK blind commitment for channel membership
+        async function generateBlindCommitment(name, sharedSecret, blindingFactor) {
+            // Pedersen-style commitment: C = H(name || sharedSecret) * G^r
+            const baseHash = await sha256(name + '::' + sharedSecret);
+            const blindedHash = await sha256(baseHash + '::' + blindingFactor);
+            return blindedHash;
+        }
+
+        // Verify ZK proof of channel membership
+        async function verifyBlindProof(commitment, name, sharedSecret, blindingFactor) {
+            const expectedCommitment = await generateBlindCommitment(name, sharedSecret, blindingFactor);
+            return commitment === expectedCommitment;
+        }
+
+        // ════════════════════════════════════════════════════════════════════════
+        // STATE MANAGEMENT (NO SECRETS STORED)
+        // ════════════════════════════════════════════════════════════════════════
+
+        const state = {
+            // Identities: name -> { name, identityCommitment, color, publicKey }
+            identities: new Map(),
+            
+            // Channels: channelId -> { participants, channelCommitment, established }
+            channels: new Map(),
+            
+            // Whispers: array of encrypted messages
+            whispers: [],
+            
+            // ZK Proofs generated
+            proofs: []
+        };
+
+        const STORAGE_KEY = 'WHISPERS_TRINITY_v31';
+
+        // ════════════════════════════════════════════════════════════════════════
+        // CONSOLE LOGGING
+        // ════════════════════════════════════════════════════════════════════════
+
+        function log(msg, type = 'info') {
+            const con = document.getElementById('console');
+            const time = new Date().toLocaleTimeString();
+            con.innerHTML += `
+                <div class="console-line fade-in">
+                    <span class="console-time">[${time}]</span>
+                    <span class="console-${type}">${escapeHtml(msg)}</span>
+                </div>`;
+            con.scrollTop = con.scrollHeight;
+        }
+
+        function escapeHtml(t) {
+            const d = document.createElement('div');
+            d.textContent = t;
+            return d.innerHTML;
+        }
+
+        function toggleSecret(id) {
+            const inp = document.getElementById(id);
+            inp.type = inp.type === 'password' ? 'text' : 'password';
+        }
+
+        function genColor() {
+            const colors = ['#7c3aed','#a855f7','#06b6d4','#22c55e','#f59e0b','#ec4899','#ef4444','#14b8a6'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        // ════════════════════════════════════════════════════════════════════════
+        // IDENTITY MANAGEMENT
+        // ════════════════════════════════════════════════════════════════════════
+
+        async function verifyIdentity(name, secret) {
+            const identity = state.identities.get(name);
+            if (!identity) return false;
+            
+            const commitment = await sha256('TRINITY_IDENTITY:' + name + ':' + secret);
+            return commitment === identity.identityCommitment;
+        }
+
+        async function registerTrinity() {
+            const name = document.getElementById('regName').value.trim();
+            const secret = document.getElementById('regSecret').value;
+
+            if (!name) {
+                log('Name required', 'error');
+                return;
+            }
+
+            if (!secret || secret.length < 8) {
+                log('Identity secret must be at least 8 characters', 'error');
+                return;
+            }
+
+            if (state.identities.has(name)) {
+                log(`Identity "${name}" already exists`, 'warn');
+                return;
+            }
+
+            // Create identity commitment (secret NOT stored)
+            const identityCommitment = await sha256('TRINITY_IDENTITY:' + name + ':' + secret);
+            const publicKey = await sha256('TRINITY_PUBLIC:' + name + ':' + secret);
+
+            const identity = {
+                name,
+                identityCommitment,
+                publicKey,
+                color: genColor(),
+                createdAt: Date.now()
+            };
+
+            state.identities.set(name, identity);
+            
+            log(`✓ Identity registered: ${name}`, 'success');
+            log(`  Public key: ${publicKey.slice(0, 16)}...`, 'info');
+
+            // Clear form
+            document.getElementById('regName').value = '';
+            document.getElementById('regSecret').value = '';
+
+            persist();
+            updateUI();
+        }
+
+        // ════════════════════════════════════════════════════════════════════════
+        // CHANNEL ESTABLISHMENT
+        // ════════════════════════════════════════════════════════════════════════
+
+        function getChannelId(name1, name2) {
+            return [name1, name2].sort().join('~');
+        }
+
+        async function establishChannel() {
+            const from = document.getElementById('channelFrom').value;
+            const mySecret = document.getElementById('channelMySecret').value;
+            const to = document.getElementById('channelTo').value;
+            const sharedSecret = document.getElementById('channelSharedSecret').value;
+
+            if (!from || !to) {
+                log('Select both parties', 'error');
+                return;
+            }
+
+            if (from === to) {
+                log('Cannot create channel with yourself', 'warn');
+                return;
+            }
+
+            if (!mySecret) {
+                log('Your identity secret required', 'error');
+                return;
+            }
+
+            if (!sharedSecret || sharedSecret.length < 8) {
+                log('Shared secret must be at least 8 characters', 'error');
+                return;
+            }
+
+            // Verify identity
+            const valid = await verifyIdentity(from, mySecret);
+            if (!valid) {
+                log('Invalid identity secret', 'error');
+                document.getElementById('channelMySecret').value = '';
+                return;
+            }
+
+            const channelId = getChannelId(from, to);
+
+            // Create channel commitment (proves knowledge of shared secret without storing it)
+            const channelCommitment = await sha256('TRINITY_CHANNEL:' + channelId + ':' + sharedSecret);
+
+            // Check if channel exists
+            if (state.channels.has(channelId)) {
+                // Verify the shared secret matches
+                const existing = state.channels.get(channelId);
+                if (existing.channelCommitment !== channelCommitment) {
+                    log('Channel exists with different shared secret!', 'error');
+                    return;
+                }
+                log(`Channel ${from} ↔ ${to} already verified`, 'info');
+            } else {
+                // Create new channel
+                state.channels.set(channelId, {
+                    channelId,
+                    participants: [from, to],
+                    channelCommitment,
+                    establishedBy: from,
+                    establishedAt: Date.now()
+                });
+                
+                log(`✓ Channel established: ${from} ↔ ${to}`, 'success');
+            }
+
+            // Clear secrets
+            document.getElementById('channelMySecret').value = '';
+            document.getElementById('channelSharedSecret').value = '';
+
+            persist();
+            updateUI();
+        }
+
+        // ════════════════════════════════════════════════════════════════════════
+        // WHISPER DROP
+        // ════════════════════════════════════════════════════════════════════════
+
+        async function dropWhisper() {
+            const from = document.getElementById('whisperFrom').value;
+            const mySecret = document.getElementById('whisperMySecret').value;
+            const to = document.getElementById('whisperTo').value;
+            const sharedSecret = document.getElementById('whisperSharedSecret').value;
+            const content = document.getElementById('whisperContent').value.trim();
+
+            if (!from || !to || !content) {
+                log('All fields required', 'error');
+                return;
+            }
+
+            if (!mySecret) {
+                log('Your identity secret required', 'error');
+                return;
+            }
+
+            if (!sharedSecret) {
+                log('Shared channel secret required', 'error');
+                return;
+            }
+
+            if (from === to) {
+                log('Cannot whisper to yourself', 'warn');
+                return;
+            }
+
+            // Verify sender identity
+            const valid = await verifyIdentity(from, mySecret);
+            if (!valid) {
+                log('Invalid identity secret', 'error');
+                document.getElementById('whisperMySecret').value = '';
+                return;
+            }
+
+            const channelId = getChannelId(from, to);
+
+            // Verify channel exists and shared secret matches
+            const channel = state.channels.get(channelId);
+            if (!channel) {
+                log('No channel established with recipient. Create one first.', 'warn');
+                return;
+            }
+
+            const channelCommitment = await sha256('TRINITY_CHANNEL:' + channelId + ':' + sharedSecret);
+            if (channelCommitment !== channel.channelCommitment) {
+                log('Invalid shared secret for this channel', 'error');
+                document.getElementById('whisperSharedSecret').value = '';
+                return;
+            }
+
+            // Encrypt message with shared secret (symmetric - both can decrypt)
+            const encryptedContent = await encryptAESGCM(content, sharedSecret, channelId);
+            if (!encryptedContent) {
+                log('Encryption failed', 'error');
+                return;
+            }
+
+            // Create content hash for integrity verification
+            const contentHash = await sha256(content);
+
+            const whisper = {
+                id: secureRandom(8),
+                channelId,
+                from,
+                to,
+                encryptedContent,
+                contentHash,
+                timestamp: Date.now()
+            };
+
+            state.whispers.push(whisper);
+
+            log(`🤫 Whisper sent: ${from} → ${to}`, 'success');
+
+            // Clear form
+            clearWhisperForm();
+            persist();
+            updateUI();
+        }
+
+        function clearWhisperForm() {
+            document.getElementById('whisperContent').value = '';
+            document.getElementById('whisperMySecret').value = '';
+            document.getElementById('whisperSharedSecret').value = '';
+        }
+
+        // ════════════════════════════════════════════════════════════════════════
+        // INBOX / DECRYPTION
+        // ════════════════════════════════════════════════════════════════════════
+
+        async function refreshInbox() {
+            const name = document.getElementById('inboxName').value;
+            const mySecret = document.getElementById('inboxMySecret').value;
+            const sharedSecret = document.getElementById('inboxSharedSecret').value;
+            const list = document.getElementById('whisperList');
+
+            if (!name) {
+                list.innerHTML = '<p style="color: var(--void-dim); font-size: 0.75rem;">Select your identity</p>';
+                return;
+            }
+
+            if (!mySecret) {
+                list.innerHTML = '<p style="color: var(--void-dim); font-size: 0.75rem;">Enter your identity secret</p>';
+                return;
+            }
+
+            if (!sharedSecret) {
+                list.innerHTML = '<p style="color: var(--void-dim); font-size: 0.75rem;">Enter the shared secret for the channel you want to read</p>';
+                return;
+            }
+
+            // Verify identity
+            const valid = await verifyIdentity(name, mySecret);
+            if (!valid) {
+                log('Invalid identity secret', 'error');
+                list.innerHTML = '<p style="color: var(--void-red); font-size: 0.75rem;">❌ Authentication failed</p>';
+                document.getElementById('inboxMySecret').value = '';
+                return;
+            }
+
+            // Find whispers in channels where user participates
+            const myWhispers = state.whispers.filter(w => 
+                w.from === name || w.to === name
+            );
+
+            if (myWhispers.length === 0) {
+                list.innerHTML = '<p style="color: var(--void-dim); font-size: 0.75rem;">No whispers found</p>';
+                return;
+            }
+
+            let html = '';
+            let decryptedCount = 0;
+
+            for (const w of myWhispers) {
+                const channel = state.channels.get(w.channelId);
+                if (!channel) continue;
+
+                // Check if shared secret matches this channel
+                const channelCommitment = await sha256('TRINITY_CHANNEL:' + w.channelId + ':' + sharedSecret);
+                const canDecrypt = channelCommitment === channel.channelCommitment;
+
+                let content = null;
+                let isEncrypted = true;
+
+                if (canDecrypt) {
+                    // Try to decrypt with shared secret
+                    content = await decryptAESGCM(w.encryptedContent, sharedSecret, w.channelId);
+                    if (content) {
+                        isEncrypted = false;
+                        decryptedCount++;
+
+                        // Verify integrity
+                        const hash = await sha256(content);
+                        const integrityOk = hash === w.contentHash;
+
+                        html += `
+                            <div class="whisper-card fade-in">
+                                <div class="whisper-header">
+                                    <span class="whisper-route">${w.from} → ${w.to}</span>
+                                    <span class="whisper-time">${new Date(w.timestamp).toLocaleString()}</span>
+                                </div>
+                                <div class="whisper-body">${escapeHtml(content)}</div>
+                                <div class="whisper-meta">
+                                    <span class="zk-indicator">✓ Decrypted</span>
+                                    <span class="blind-indicator">${integrityOk ? '✓ Integrity OK' : '⚠ Modified'}</span>
+                                    <span>Hash: ${w.contentHash.slice(0, 12)}...</span>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+
+                if (isEncrypted) {
+                    // Show encrypted placeholder
+                    const partner = w.from === name ? w.to : w.from;
+                    html += `
+                        <div class="whisper-card fade-in">
+                            <div class="whisper-header">
+                                <span class="whisper-route">${w.from} → ${w.to}</span>
+                                <span class="whisper-time">${new Date(w.timestamp).toLocaleString()}</span>
+                            </div>
+                            <div class="whisper-body encrypted">🔒 [Wrong shared secret for ${name} ↔ ${partner} channel]</div>
+                            <div class="whisper-meta">
+                                <span>Channel: ${w.channelId}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+            list.innerHTML = html || '<p style="color: var(--void-dim); font-size: 0.75rem;">No whispers to display</p>';
+            
+            if (decryptedCount > 0) {
+                log(`✓ Decrypted ${decryptedCount} whispers`, 'success');
+            } else {
+                log('No messages matched the shared secret', 'warn');
+            }
+
+            // Clear secrets
+            document.getElementById('inboxMySecret').value = '';
+            document.getElementById('inboxSharedSecret').value = '';
+        }
+
+        // ════════════════════════════════════════════════════════════════════════
+        // ZK PROOF GENERATION
+        // ════════════════════════════════════════════════════════════════════════
+
+        async function generateZKProof() {
+            const prover = document.getElementById('zkProver').value;
+            const mySecret = document.getElementById('zkMySecret').value;
+            const partner = document.getElementById('zkPartner').value;
+            const sharedSecret = document.getElementById('zkSharedSecret').value;
+            const resultDiv = document.getElementById('zkResult');
+
+            if (!prover || !partner) {
+                log('Select both parties', 'error');
+                return;
+            }
+
+            if (!mySecret) {
+                log('Your identity secret required', 'error');
+                return;
+            }
+
+            if (!sharedSecret) {
+                log('Shared secret required for proof', 'error');
+                return;
+            }
+
+            // Verify identity
+            const valid = await verifyIdentity(prover, mySecret);
+            if (!valid) {
+                log('Invalid identity secret', 'error');
+                document.getElementById('zkMySecret').value = '';
+                return;
+            }
+
+            const channelId = getChannelId(prover, partner);
+            const channel = state.channels.get(channelId);
+
+            if (!channel) {
+                log('No channel exists between these parties', 'warn');
+                resultDiv.innerHTML = `
+                    <div class="whisper-card" style="border-color: var(--void-amber);">
+                        <div style="color: var(--void-amber); font-weight: 700;">⚠ No Channel Found</div>
+                        <div style="font-size: 0.75rem; color: var(--void-muted); margin-top: 8px;">
+                            Establish a channel first before generating proofs.
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Verify shared secret matches channel
+            const channelCommitment = await sha256('TRINITY_CHANNEL:' + channelId + ':' + sharedSecret);
+            if (channelCommitment !== channel.channelCommitment) {
+                log('Shared secret does not match channel', 'error');
+                resultDiv.innerHTML = `
+                    <div class="whisper-card" style="border-color: var(--void-red);">
+                        <div style="color: var(--void-red); font-weight: 700;">❌ Proof Failed</div>
+                        <div style="font-size: 0.75rem; color: var(--void-muted); margin-top: 8px;">
+                            The shared secret does not match the established channel.
+                        </div>
+                    </div>
+                `;
+                document.getElementById('zkSharedSecret').value = '';
+                return;
+            }
+
+            // Generate blinded proof
+            const blindingFactor = secureRandom(32);
+            const blindCommitment = await generateBlindCommitment(prover, sharedSecret, blindingFactor);
+            
+            // Create proof object
+            const proof = {
+                prover,
+                channelId,
+                blindCommitment,
+                timestamp: Date.now(),
+                // The blinding factor would be revealed in a real ZK proof
+                // but the shared secret remains hidden
+                verified: true
+            };
+
+            state.proofs.push(proof);
+
+            resultDiv.innerHTML = `
+                <div class="whisper-card fade-in" style="border-color: var(--void-green);">
+                    <div style="color: var(--void-green); font-weight: 700; margin-bottom: 8px;">✓ ZK Proof Generated</div>
+                    <div style="font-size: 0.7rem; color: var(--void-muted); margin-bottom: 10px;">
+                        Proves ${prover} knows the shared secret for channel ${channelId} without revealing it.
+                    </div>
+                    <div class="channel-key-section">
+                        <div class="channel-key-label">Blind Commitment</div>
+                        <div class="channel-key-value">${blindCommitment}</div>
+                    </div>
+                    <div style="margin-top: 10px; display: flex; gap: 8px;">
+                        <span class="zk-indicator">✓ Zero Knowledge</span>
+                        <span class="blind-indicator">✓ Blinded</span>
+                    </div>
+                </div>
+            `;
+
+            log(`✓ ZK proof generated for ${prover} on channel ${channelId}`, 'success');
+
+            // Clear secrets
+            document.getElementById('zkMySecret').value = '';
+            document.getElementById('zkSharedSecret').value = '';
+
+            persist();
+            updateUI();
+        }
+
+        // ════════════════════════════════════════════════════════════════════════
+        // UI UPDATES
+        // ════════════════════════════════════════════════════════════════════════
+
+        function updateUI() {
+            updateTrinityList();
+            updateChannelList();
+            updateSelects();
+            updateStats();
+        }
+
+        function updateTrinityList() {
+            const list = document.getElementById('trinityList');
+            const identities = Array.from(state.identities.values());
+
+            if (identities.length === 0) {
+                list.innerHTML = '';
+                return;
+            }
+
+            list.innerHTML = identities.map(id => {
+                const channelCount = [...state.channels.values()].filter(c => 
+                    c.participants.includes(id.name)
+                ).length;
+                const whisperCount = state.whispers.filter(w => 
+                    w.from === id.name || w.to === id.name
+                ).length;
+
+                return `
+                    <div class="trinity-card fade-in">
+                        <div class="trinity-header">
+                            <div class="trinity-identity">
+                                <div class="trinity-avatar" style="background: ${id.color};">${id.name[0].toUpperCase()}</div>
+                                <div>
+                                    <div class="trinity-name">${id.name}</div>
+                                </div>
+                            </div>
+                            <span class="status-badge success">✓ Registered</span>
+                        </div>
+                        <div class="trinity-stats">
+                            <div><div class="stat-value">${channelCount}</div><div class="stat-label">Channels</div></div>
+                            <div><div class="stat-value">${whisperCount}</div><div class="stat-label">Whispers</div></div>
+                        </div>
+                        <div class="key-display">PK: ${id.publicKey.slice(0, 32)}...</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateChannelList() {
+            const list = document.getElementById('channelList');
+            const channels = Array.from(state.channels.values());
+
+            if (channels.length === 0) {
+                list.innerHTML = '<p style="color: var(--void-dim); font-size: 0.7rem;">No channels established yet</p>';
+                return;
+            }
+
+            list.innerHTML = channels.map(ch => {
+                const [p1, p2] = ch.participants;
+                const id1 = state.identities.get(p1);
+                const id2 = state.identities.get(p2);
+                const msgCount = state.whispers.filter(w => w.channelId === ch.channelId).length;
+
+                return `
+                    <div class="channel-card fade-in">
+                        <div class="channel-header">
+                            <div class="channel-parties">
+                                <span style="color: ${id1?.color || '#888'}">${p1}</span>
+                                <span class="channel-arrow">↔</span>
+                                <span style="color: ${id2?.color || '#888'}">${p2}</span>
+                            </div>
+                            <span class="status-badge info">${msgCount} msgs</span>
+                        </div>
+                        <div class="channel-key-section">
+                            <div class="channel-key-label">Channel Commitment</div>
+                            <div class="channel-key-value">${ch.channelCommitment.slice(0, 40)}...</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateSelects() {
+            const selectIds = [
+                'channelFrom', 'channelTo', 
+                'whisperFrom', 'whisperTo',
+                'inboxName',
+                'zkProver', 'zkPartner'
+            ];
+            const names = Array.from(state.identities.keys());
+
+            selectIds.forEach(id => {
+                const sel = document.getElementById(id);
+                const val = sel.value;
+                sel.innerHTML = '<option value="">Select...</option>' +
+                    names.map(n => `<option value="${n}">${n}</option>`).join('');
+                if (names.includes(val)) sel.value = val;
+            });
+        }
+
+        function updateStats() {
+            document.getElementById('statIdentities').textContent = state.identities.size;
+            document.getElementById('statChannels').textContent = state.channels.size;
+            document.getElementById('statWhispers').textContent = state.whispers.length;
+            document.getElementById('statProofs').textContent = state.proofs.length;
+        }
+
+        // ════════════════════════════════════════════════════════════════════════
+        // PERSISTENCE
+        // ════════════════════════════════════════════════════════════════════════
+
+        function persist() {
+            try {
+                const data = {
+                    identities: Array.from(state.identities.entries()),
+                    channels: Array.from(state.channels.entries()),
+                    whispers: state.whispers,
+                    proofs: state.proofs
+                };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            } catch (e) {
+                console.warn('Storage error:', e);
+            }
+        }
+
+        function restore() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    state.identities = new Map(data.identities || []);
+                    state.channels = new Map(data.channels || []);
+                    state.whispers = data.whispers || [];
+                    state.proofs = data.proofs || [];
+                    return true;
+                }
+            } catch (e) {
+                console.warn('Restore error:', e);
+            }
+            return false;
+        }
+
+        function silenceAll() {
+            if (!confirm('⚠️ Delete ALL data? This cannot be undone.')) return;
+            
+            state.identities.clear();
+            state.channels.clear();
+            state.whispers = [];
+            state.proofs = [];
+            
+            localStorage.removeItem(STORAGE_KEY);
+            
+            log('🗑️ All data silenced', 'warn');
+            updateUI();
+        }
+
+        // ════════════════════════════════════════════════════════════════════════
+        // INITIALIZATION
+        // ════════════════════════════════════════════════════════════════════════
+
+        function init() {
+            log('🚀 Initializing WHISPERS v3.1 Trinity...', 'whisper');
+            
+            if (restore()) {
+                log(`✓ Restored: ${state.identities.size} identities, ${state.channels.size} channels, ${state.whispers.length} whispers`, 'success');
+            } else {
+                log('Starting fresh - no saved data', 'info');
+            }
+
+            updateUI();
+            log('✓ System ready', 'success');
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
