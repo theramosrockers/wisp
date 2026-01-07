@@ -105,6 +105,27 @@
             50% { box-shadow: 0 0 12px var(--void-green), 0 0 20px var(--void-green); }
         }
 
+        .file-controls {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            padding: 16px 20px;
+            background: var(--void-surface);
+            border: 1px solid var(--void-border);
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .file-controls .whisper-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
         .security-banner {
             background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(6, 182, 212, 0.15));
             border: 1px solid rgba(124, 58, 237, 0.3);
@@ -145,6 +166,7 @@
             .whisper-grid { grid-template-columns: 1fr; }
             .whisper-logo { font-size: 2rem; }
             .security-banner { flex-direction: column; text-align: center; }
+            .file-controls { flex-direction: column; }
         }
 
         .whisper-panel {
@@ -289,6 +311,14 @@
         .whisper-btn.small {
             padding: 6px 12px;
             font-size: 0.7rem;
+        }
+
+        .whisper-btn.void-export {
+            background: linear-gradient(135deg, var(--whisper-cyan), var(--whisper-teal));
+        }
+
+        .whisper-btn.void-import {
+            background: linear-gradient(135deg, var(--void-amber), #d97706);
         }
 
         .btn-row {
@@ -641,6 +671,19 @@
             <div class="whisper-subtitle">The Void Edition • Trinity Protocol • Blind Shared Secrets</div>
             <div class="version-badge">v3.1 TRINITY • ZK BLIND SHARING • PGP-STYLE CHANNELS</div>
         </header>
+
+        <!-- Void File Import/Export Controls -->
+        <div class="file-controls">
+            <button class="whisper-btn void-export" onclick="exportVoidFile()">
+                <span>📤</span>
+                <span>Export Void File</span>
+            </button>
+            <button class="whisper-btn void-import" onclick="document.getElementById('voidFileInput').click()">
+                <span>📥</span>
+                <span>Import Void File</span>
+            </button>
+            <input type="file" id="voidFileInput" class="file-input" accept=".void,.json" onchange="importVoidFile(event)">
+        </div>
 
         <div class="security-banner">
             <div class="security-icon">🔐</div>
@@ -1024,6 +1067,105 @@
         };
 
         const STORAGE_KEY = 'WHISPERS_TRINITY_v31';
+
+        // ════════════════════════════════════════════════════════════════════════
+        // VOID FILE IMPORT/EXPORT
+        // ════════════════════════════════════════════════════════════════════════
+
+        function exportVoidFile() {
+            const exportData = {
+                version: '3.1',
+                type: 'WHISPERS_VOID_FILE',
+                exportedAt: new Date().toISOString(),
+                data: {
+                    identities: Array.from(state.identities.entries()),
+                    channels: Array.from(state.channels.entries()),
+                    whispers: state.whispers,
+                    proofs: state.proofs
+                }
+            };
+
+            const jsonString = JSON.stringify(exportData, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+            const filename = `whispers-void-${timestamp}.void`;
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            log(`📤 Exported void file: ${filename}`, 'success');
+            log(`   ${state.identities.size} identities, ${state.channels.size} channels, ${state.whispers.length} whispers`, 'info');
+        }
+
+        function importVoidFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importData = JSON.parse(e.target.result);
+
+                    // Validate file structure
+                    if (importData.type !== 'WHISPERS_VOID_FILE') {
+                        log('Invalid void file format', 'error');
+                        return;
+                    }
+
+                    if (!importData.data) {
+                        log('Void file contains no data', 'error');
+                        return;
+                    }
+
+                    // Confirm import
+                    const identityCount = importData.data.identities?.length || 0;
+                    const channelCount = importData.data.channels?.length || 0;
+                    const whisperCount = importData.data.whispers?.length || 0;
+
+                    const confirmMsg = `Import void file?\n\nContains:\n• ${identityCount} identities\n• ${channelCount} channels\n• ${whisperCount} whispers\n\nThis will REPLACE all current data.`;
+                    
+                    if (!confirm(confirmMsg)) {
+                        log('Import cancelled', 'warn');
+                        event.target.value = '';
+                        return;
+                    }
+
+                    // Import data
+                    state.identities = new Map(importData.data.identities || []);
+                    state.channels = new Map(importData.data.channels || []);
+                    state.whispers = importData.data.whispers || [];
+                    state.proofs = importData.data.proofs || [];
+
+                    persist();
+                    updateUI();
+
+                    log(`📥 Imported void file: ${file.name}`, 'success');
+                    log(`   Version: ${importData.version}, Exported: ${importData.exportedAt}`, 'info');
+                    log(`   ${state.identities.size} identities, ${state.channels.size} channels, ${state.whispers.length} whispers`, 'info');
+
+                } catch (err) {
+                    console.error('Import error:', err);
+                    log('Failed to parse void file: ' + err.message, 'error');
+                }
+
+                // Reset file input
+                event.target.value = '';
+            };
+
+            reader.onerror = function() {
+                log('Failed to read void file', 'error');
+                event.target.value = '';
+            };
+
+            reader.readAsText(file);
+        }
 
         // ════════════════════════════════════════════════════════════════════════
         // CONSOLE LOGGING
